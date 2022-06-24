@@ -1,0 +1,12 @@
+# Charging the data and putting them on Time Series form with ts
+# mensual series from january 1949 to december 61, 12*12 = 144 values
+
+airline.data <- read.table("airline.dat")
+airline <- airline.data$V1
+airline <- ts(airline, start = c(1949,1), freq = 12)
+
+# Chronogram and legends...
+
+plot(airline, type='o', xlab="Date", ylab="Passengers (in thousands)", 
+     main="Aerian international trafic from january 1949 to dec. 1960)
+grid()
