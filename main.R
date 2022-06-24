@@ -1,3 +1,16 @@
+# Charging the data and putting them on Time Series form with ts
+# mensual series from january 1949 to december 61, 12*12 = 144 values
+
+airline.data <- read.table("airline.dat")
+airline <- airline.data$V1
+airline <- ts(airline, start = c(1949,1), freq = 12)
+
+# Chronogram and legends...
+
+plot(airline, type='o', xlab="Date", ylab="Passengers (in thousands)", 
+     main="Aerian international trafic from january 1949 to dec. 1960)
+grid()
+
 # We will do a first simple transformation by using the logarithm of the values
 
 logair <- log(airline)
@@ -112,12 +125,6 @@ plot( airline , type='o', xlab='Year', ylab='Passengers (in thousands)',
      main ="SARIMA prevision of the aerian trafic and real values", ylim=c(100,700))
 grid()
 
-#RMSE <- 0
-#for(k in 1:12){
-#        RMSE <- RMSE + (airline[nair -12 + k] - a[k])^2 
-#}
-#RMSE <- RMSE/12
-#RMSE
 
 ereal <- airline[(nair - 11):nair]
 epred <- exp(prevision$pred)
@@ -126,8 +133,8 @@ print(RMSE)
 
 
 
-# Question 2
-#On va utliser un modele MA(13) pour la prédiction des Xt
+
+# We will use un modele MA(13) model to predict Xt (the lest 12 test values)
 
 mod13 <- arima(logairfit, order = c(0,0,13))
 print(mod13)
@@ -139,10 +146,10 @@ qqnorm(residu13, main = "Normal Q-Q Plot", xlab = "Theoretical Quantiles",
 grid()
 qqline(residu13, probs=c(0.1,0.9), col="red", lwd=2)
 
-#Prévision pour le logarithme de ma série
+#Prevision for the logarithm of the serie
 
-plot(logair, type='o', xlab='Temps', ylab='Log Nbre Passagers',
-     main ="Prévision MA(13) et valeurs réelles", ylim=c(4.5,6.8))
+plot(logair, type='o', xlab='Time', ylab='Log Nb Passengers',
+     main =" MA(13) prevision and real values", ylim=c(4.5,6.8))
 grid()
 
 prev13 <- predict(mod13, n.ahead=12, prediction.interval=T)
@@ -151,7 +158,7 @@ lines( ts(prev13$pred, start=c(1960,1), freq=12), type='o', col='red', lwd=2 )
 lines( ts(prev13$pred + 2*prev13$se, start=c(1960,1), freq=12),  col='blue', lwd=2 )
 lines( ts(prev13$pred - 2*prev13$se, start=c(1960,1), freq=12),  col='blue', lwd=2 )
 
-#prévision pour la série
+#Prevision for the serie
 
 a13 <- matrix(0, nrow = 1, ncol = 12)
 b13 <- matrix(0, nrow = 1, ncol = 12)
@@ -164,7 +171,7 @@ for (k in 1:12){
 
 
 plot( airline , type='o', xlab='Année', ylab='Passagers (en milliers)',
-      main ="Prévision MA(13) du trafic aérien et valeurs réelles", ylim=c(100,700))
+      main ="MA(13) prevision of aerian trafic and real values", ylim=c(100,700))
 grid()
 
 
@@ -175,26 +182,23 @@ lines( ts( c13[1,] , start=c(1960,1), freq=12),  col='blue', lwd=2 )
 
 #Calcul du RMSE
 
-RMSE <- 0
-for(k in 1:12){
-        RMSE <- RMSE + (airline[nair -12 + k] - a13[k])^2 
-}
-RMSE <- RMSE/12
-RMSE
+
 
 ereal <- airline[(nair - 11):nair]
 epred <- exp(prev13$pred)
 RMSE <- sqrt(sum((ereal-epred)^2)/12)
 print(RMSE)
 
-# Question 3 :
+
 # On estime de manière paramétrique la tendance et saisonnalité du log de la série,
 # et on traite la série obtenue comme une série stationnaire. On travaille sur 
 # l'historique privé des 12 dernières valeurs pour tester à nouveau la qualité 
 # de la prévision obtenue.
+# We estime with parametrci methods the tendency of the seasonnality of the logarithm of the serie,
+# we process the obtain serie like a stationnary serie.
+# We work on the private history of the last 12 values to test the quality of the btain forecasting
 
-
-rm(list=ls()) # on efface tout
+rm(list=ls()) 
 
 airline.data <- read.table("airline.dat")
 airline <- airline.data$V1
